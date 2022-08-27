@@ -5,8 +5,8 @@ resources:
 - deployment.yaml
 - service.yaml
 
+  # every time image changes the sha value bellow will be updated
 images:
 - name: goserver
   newName: luccostajr/gitops
-  # every time image changes the sha value bellow will be updated
-  newTag: sha
+  newTag: d6e90e9d40f1cdd35d46584fe3ece26c22dfd3cf
