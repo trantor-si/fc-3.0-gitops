@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # download github repository to branche
+    # download github repository to current branch
     - name: Checkout code
       uses: actions/checkout@v2
 
@@ -23,24 +23,31 @@ jobs:
         repository: ${{ secrets.DOCKER_USERNAME }}/gitops
         tags: ${{ github.sha }}, latest
 
+    # install the kustomize process
     - name: Setup Kustomize
       uses: imranismail/setup-kustomize@v1
       with: 
         kustomize-version: "3.6.1"
 
+    # using kustomize process, 
+    #   update the sha value in k8s/kustomization.yaml file! 
     - name: Update Kubernetes resources
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      run: |
+      # the value of $GITHUB_SHA will be setted to tags in 
+      #   k8s/kustomization.yaml
+      run: | # the pipe character allows multiline declaration
         cd k8s
         kustomize edit set image goserver=$DOCKER_USERNAME/gitops:$GITHUB_SHA
 
+    # commit changes to git
     - name: Commit
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git commit -am "Bump docker version"
+        git commit -am "feat: :sparkles: [CD] Bump docker version"
 
+    # send (push) the image to github
     - name: Push
       uses: ad-m/github-push-action@master
       with:
